@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  <h2>{% if customer %}Edit{% else %}Add{% endif %} Customer</h2>
+  
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save</button>
+  </form>
+
+  {% if customer %}
+    <a href="{% url 'customer_list' %}">Back to Customer List</a>
+  {% endif %}
+
+{% endblock %}
