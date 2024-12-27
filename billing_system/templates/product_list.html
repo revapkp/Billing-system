@@ -1,0 +1,33 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product List</title>
+</head>
+<body>
+    <h1>Product List</h1>
+
+    <!-- Search Form -->
+    <form method="GET" action="{% url 'search_products' %}">
+        <input type="text" name="q" value="{{ query }}" placeholder="Search Products..." />
+        <button type="submit">Search</button>
+    </form>
+
+    <ul>
+        {% if products %}
+            {% for product in products %}
+                <li>
+                    {{ product.product_name }} - ${{ product.rate }} - {{ product.tax_percentage }}%
+                    <a href="{% url 'edit_product' product.id %}">Edit</a>
+                </li>
+            {% endfor %}
+        {% else %}
+            <li>No products found matching "{{ query }}"</li>
+        {% endif %}
+    </ul>
+
+    <a href="{% url 'add_product' %}">Add New Product</a>
+</body>
+</html>
