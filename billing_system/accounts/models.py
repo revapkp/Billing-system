@@ -1,8 +1,6 @@
 from django.db import models
 
 
-
-# Customer Model
 class Customer(models.Model):
     name = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=15, unique=True)
@@ -11,7 +9,7 @@ class Customer(models.Model):
     def __str__(self):
         return self.name
 
-# Product Model
+
 class Product(models.Model):
     product_name = models.CharField(max_length=255)
     rate = models.DecimalField(max_digits=10, decimal_places=2)
@@ -20,7 +18,7 @@ class Product(models.Model):
     def __str__(self):
         return self.product_name
 
-# Invoice Model
+
 class Invoice(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     invoice_number = models.CharField(max_length=255, unique=True)
@@ -29,16 +27,23 @@ class Invoice(models.Model):
     def __str__(self):
         return f"Invoice #{self.invoice_number}"
 
-# InvoiceItem Model (for line items in an invoice)
+
 class InvoiceItem(models.Model):
-    invoice = models.ForeignKey(Invoice, related_name='items', on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    invoice = models.ForeignKey('Invoice', related_name='items', on_delete=models.CASCADE)
+    product = models.ForeignKey('Product', on_delete=models.CASCADE)
     quantity = models.IntegerField()
     rate = models.DecimalField(max_digits=10, decimal_places=2)
-    tax = models.DecimalField(max_digits=10, decimal_places=2)
-    subtotal = models.DecimalField(max_digits=10, decimal_places=2)
-    
-    def save(self, *args, **kwargs):
-        self.subtotal = (self.quantity * self.rate) + (self.quantity * self.rate * self.tax / 100)
-        super().save(*args, **kwargs)
+    tax = models.DecimalField(max_digits=5, decimal_places=2)  # Tax rate as percentage (e.g., 8 for 8%)
+    subtotal = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
 
+   
+    def save(self, *args, **kwargs):
+        if self.quantity is None:
+            self.quantity = 1  
+        if self.rate is None:
+            self.rate = 0  
+        if self.tax is None:
+            self.tax = 0  
+       
+        self.subtotal = (self.quantity * self.rate) + (self.quantity * self.rate * (self.tax / 100))
+        super().save(*args, **kwargs)

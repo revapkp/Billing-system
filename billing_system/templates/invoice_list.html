@@ -1,0 +1,28 @@
+<h1>Invoices</h1>
+<form method="GET">
+    <input type="text" name="search" placeholder="Search by Invoice Number" />
+    <button type="submit">Search</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>Invoice Number</th>
+            <th>Customer</th>
+            <th>Date</th>
+            <th>Total Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for invoice in invoices %}
+            <tr>
+                <td>{{ invoice.invoice_number }}</td>
+                <td>{{ invoice.customer.name }}</td>
+                <td>{{ invoice.date }}</td>
+                <td>{{ invoice.total_amount|floatformat:2 }}</td> 
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+

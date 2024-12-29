@@ -1,0 +1,78 @@
+<form method="post">
+    {% csrf_token %}
+    {{ invoice_form.as_p }}
+
+    <div class="invoice-items">
+        <div id="formset">
+            {% for form in item_formset %}
+                <div class="form-row">
+                    {{ form.as_p }}
+                </div>
+            {% endfor %}
+        </div>
+
+       
+        <button type="button" id="add-product-btn">Add More Products</button>
+
+        
+        {{ item_formset.management_form }}
+
+        <button type="submit">Save Invoice</button>
+    </div>
+</form>
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        var formCount = parseInt('{{ item_formset.management_form.initial.TOTAL_FORMS }}', 10); 
+        var addButton = document.getElementById("add-product-btn");
+        var formsetContainer = document.getElementById("formset");
+
+       
+        if (!formsetContainer) {
+            console.error('Formset container not found');
+            return;
+        }
+
+        
+        addButton.addEventListener("click", function() {
+            
+            var lastForm = formsetContainer.lastElementChild;
+            if (!lastForm) {
+                console.error('No forms to clone');
+                return;
+            }
+
+            
+            var newForm = lastForm.cloneNode(true);
+            var inputs = newForm.querySelectorAll("input, select");
+            inputs.forEach(function(input) {
+                input.value = ""; 
+            });
+
+            
+            var totalFormsInput = document.querySelector("input[name='{{ item_formset.management_form.prefix }}-TOTAL_FORMS']");
+            var formPrefix = '{{ item_formset.management_form.prefix }}-';  
+
+            
+            var newFormIndex = formCount;  
+            inputs.forEach(function(input) {
+                
+                var namePrefix = formPrefix + formCount + '-';
+                input.name = input.name.replace(formPrefix + (formCount - 1) + '-', namePrefix);
+                input.id = input.id.replace(formPrefix + (formCount - 1) + '-', namePrefix);
+            });
+
+           
+            formsetContainer.appendChild(newForm);
+
+            
+            totalFormsInput.value = formCount + 1;
+
+            
+            formCount++;
+        });
+    });
+</script>
+
+
